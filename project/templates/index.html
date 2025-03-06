@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Personal Fitness Tracker</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: url('https://hips.hearstapps.com/hmg-prod/images/home-workout-lead-1584370797.jpg') no-repeat center center fixed;
+            background-size: cover;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            height: 100vh;
+        }
+        .container {
+            width: 60%;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 20px;
+            box-shadow: 0px 0px 10px 0px #00000033;
+            border-radius: 10px;
+            margin-top: 20px;
+        }
+        .input-group {
+            margin: 10px 0;
+        }
+        input, select, button {
+            width: 100%;
+            padding: 10px;
+            margin: 5px 0;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        button {
+            background-color: #28a745;
+            color: white;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #218838;
+        }
+        table {
+            width: 100%;
+            margin-top: 20px;
+            border-collapse: collapse;
+        }
+        th, td {
+            border: 1px solid #ccc;
+            padding: 10px;
+        }
+        th {
+            background-color: #28a745;
+            color: white;
+        }
+        #recommendations {
+            margin-top: 20px;
+            font-weight: bold;
+            color: #155724;
+        }
+    </style>
+</head>
+<body>
+    <h2>Personal Fitness Tracker</h2>
+    <div class="container">
+        <form id="fitnessForm">
+            <div class="input-group"><input type="number" name="age" placeholder="Age" required></div>
+            <div class="input-group"><input type="number" name="bmi" placeholder="BMI" required></div>
+            <div class="input-group"><input type="number" name="duration" placeholder="Duration (minutes)" required></div>
+            <div class="input-group"><input type="number" name="heartRate" placeholder="Heart Rate (bpm)" required></div>
+            <div class="input-group">
+                <select name="gender">
+                    <option value="male">Male</option>
+                    <option value="female">Female</option>
+                </select>
+            </div>
+            <div class="input-group">
+                <select name="goal" id="goal">
+                    <option value="weight_loss">Weight Loss</option>
+                    <option value="muscle_gain">Muscle Gain</option>
+                    <option value="endurance">Endurance</option>
+                </select>
+            </div>
+            <button type="submit">Calculate & Get Recommendations</button>
+        </form>
+        <h3>Workout History</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Age</th>
+                    <th>BMI</th>
+                    <th>Duration (min)</th>
+                    <th>Heart Rate (bpm)</th>
+                    <th>Gender</th>
+                    <th>Calories Burned</th>
+                </tr>
+            </thead>
+            <tbody id="workoutHistory"></tbody>
+        </table>
+        <h3>Exercise Recommendations</h3>
+        <p id="recommendations">Select a goal and submit to see recommendations.</p>
+    </div>
+    <script>
+        document.getElementById("fitnessForm").addEventListener("submit", function(event) {
+            event.preventDefault();
+            let formData = new FormData(this);
+            fetch("/calculate", {
+                method: "POST",
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                let historyTable = document.getElementById("workoutHistory");
+                let row = `<tr>
+                    <td>${data.date}</td>
+                    <td>${data.age}</td>
+                    <td>${data.bmi}</td>
+                    <td>${data.duration}</td>
+                    <td>${data.heartRate}</td>
+                    <td>${data.gender}</td>
+                    <td>${data.caloriesBurned}</td>
+                </tr>`;
+                historyTable.innerHTML += row;
+                
+                document.getElementById("recommendations").textContent = data.recommendations;
+            });
+        });
+    </script>
+</body>
+</html>
